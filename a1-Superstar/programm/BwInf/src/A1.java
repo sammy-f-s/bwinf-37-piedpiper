@@ -11,7 +11,7 @@ public class A1 {
     public static void main (String args[]) throws IOException{
         int anfragenAmount = 0;
         boolean doesntFollow = false;
-        boolean getsFollowed = false;
+        boolean getsFollowed = false; //Bedingung für Superstar: er folgt nicht, wird aber von allen gefolgt
         StringBuilder namen[] = splitFile();
         String superstars[] = new String[namen.length-1];
         int ArrayStelle = 0;
@@ -20,7 +20,7 @@ public class A1 {
             getsFollowed = true;
             for (int j = 0; namen.length - 1 >= j; j++) {
 
-                if (anfrage(namen[i].toString(), namen[j].toString()) == true) {
+                if (anfrage(namen[i].toString(), namen[j].toString()) == true) { //Falls die Person folgt, wird direkt abgebrochen und die nächste Person ausprobiert
                     doesntFollow = false;
                     break;
                 }
@@ -29,7 +29,7 @@ public class A1 {
             }
 
             if(doesntFollow == true) {
-                for (int j = 0; namen.length - 1 >= j; j++) {
+                for (int j = 0; namen.length - 1 >= j; j++) { //Das gleiche wie vorher, nur mit der nächsten Bedingung
                     if (!anfrage(namen[j].toString(), namen[i].toString()) && namen[j] != namen[i]) {
                         getsFollowed = false;
                         break;
@@ -38,7 +38,7 @@ public class A1 {
                 }
             }
 
-        if(getsFollowed == true && doesntFollow == true){
+        if(getsFollowed == true && doesntFollow == true){ //Falls beide Bedingungen zutreffen wird die Person der Liste hinzugefügt
             superstars[ArrayStelle] = namen[i].toString();
             ArrayStelle++;
         }
@@ -51,7 +51,7 @@ public class A1 {
 
     }
 
-    public static StringBuilder[] splitFile()throws IOException{
+    public static StringBuilder[] splitFile()throws IOException{  //String in Array aufteilen -> jeder Name hat eine Zeile
         List<String> lines = Collections.emptyList();
         lines = Files.readAllLines(Paths.get("C:\\Users\\David\\IdeaProjects\\bwinf-sammy-david\\a1-Superstar\\programm\\BwInf\\src\\part.txt"), StandardCharsets.UTF_16);
         System.out.println(lines);
@@ -63,7 +63,7 @@ public class A1 {
             if (names.charAt(i) == ' ') spaceAmount++;
         }
         StringBuilder[] allNames = new StringBuilder[spaceAmount + 1];
-        for(int i = 0; names.length()-1 >= i; i++){ //String in Array aufteilen -> jeder Name hat eine Zeile
+        for(int i = 0; names.length()-1 >= i; i++){
             if (allNames[ArrayStelle] == null) allNames[ArrayStelle] =  new StringBuilder("");
             if(names.charAt(i) == ' ') {
                 ArrayStelle++;
@@ -77,7 +77,7 @@ public class A1 {
 
     }
 
-    public static boolean anfrage(String name1, String name2)throws IOException{
+    public static boolean anfrage(String name1, String name2)throws IOException{ //Anfrage: ob X, Y folgt
         List<String> lines = Collections.emptyList();
         lines = Files.readAllLines(Paths.get("C:\\Users\\David\\IdeaProjects\\bwinf-sammy-david\\a1-Superstar\\programm\\BwInf\\src\\part.txt"), StandardCharsets.UTF_16);
         for(int i = 1;lines.size()-1 >= i;i++){
