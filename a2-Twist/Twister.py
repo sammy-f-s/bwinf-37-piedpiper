@@ -1,3 +1,5 @@
+from random import randint
+
 class Twister:
 
     @staticmethod
@@ -13,7 +15,11 @@ class Twister:
             else:  # Bei drei oder weniger Buchstaben macht es keinen Sinn zu twisten
                 twisted_words.append(word)
 
-        print(twisted_words)
+        output = "Getwisteter Text: "
+        for twisted_word in twisted_words:
+            output += " " + twisted_word
+
+        print(output)
 
     @staticmethod
     def twist_word(to_twist):
@@ -37,16 +43,25 @@ class Twister:
 
         boundary_right = len(to_twist)-1
 
-        if first_letter_index == -1:  # Nur ein Sonderzeichen
+        if first_letter_index == -1:  # Nur ein Sonderzeichen ist vorhanden
             return to_twist
 
-        return prefix + Twister.twist_letters(to_twist[boundary_left:boundary_right]) + to_twist[len(to_twist)-1]
+        twisted_letters = Twister.twist_letters(to_twist[boundary_left:boundary_right])
+        suffix = to_twist[len(to_twist)-1]
+        return prefix + twisted_letters + suffix
 
     @staticmethod
     def twist_letters(to_twist):
         ergebnis = ""
-        for letter in to_twist:
-            ergebnis += "X"
+        used_positions = []
+
+        for _ in range(len(to_twist)):
+            random_position = randint(0, len(to_twist) - 1)
+            while random_position in used_positions:
+                random_position = randint(0, len(to_twist) - 1)
+
+            ergebnis += to_twist[random_position]
+            used_positions.append(random_position)
 
         return ergebnis
 
