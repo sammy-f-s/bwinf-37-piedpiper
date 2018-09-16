@@ -1,5 +1,8 @@
 
 
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -53,8 +56,8 @@ public class A1 {
 
     public static StringBuilder[] splitFile()throws IOException{  //String in Array aufteilen -> jeder Name hat eine Zeile
         List<String> lines = Collections.emptyList();
-        lines = Files.readAllLines(Paths.get("C:\\Users\\David\\IdeaProjects\\bwinf-sammy-david\\a1-Superstar\\programm\\BwInf\\src\\part.txt"), StandardCharsets.UTF_16);
-        System.out.println(lines);
+        lines = Files.readAllLines(Paths.get(chooseFile()), StandardCharsets.UTF_16);
+        //System.out.println(lines);
         int spaceAmount = 0;
         int ArrayStelle = 0;
         String names = lines.get(0);
@@ -79,7 +82,7 @@ public class A1 {
 
     public static boolean anfrage(String name1, String name2)throws IOException{ //Anfrage: ob X, Y folgt
         List<String> lines = Collections.emptyList();
-        lines = Files.readAllLines(Paths.get("C:\\Users\\David\\IdeaProjects\\bwinf-sammy-david\\a1-Superstar\\programm\\BwInf\\src\\part.txt"), StandardCharsets.UTF_16);
+        lines = Files.readAllLines(Paths.get(chooseFile()), StandardCharsets.UTF_16);
         for(int i = 1;lines.size()-1 >= i;i++){
             if((lines.get(i)).contains(name1 + " " + name2)){
                 return true;
@@ -89,4 +92,16 @@ public class A1 {
 
     }
 
+    public static String chooseFile(){
+        JFileChooser chooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("Textdateien", "txt");
+        chooser.setFileFilter(filter);
+        int chosen = chooser.showOpenDialog(null);
+
+        if(chosen == JFileChooser.APPROVE_OPTION) {
+            return chooser.getSelectedFile().toString();
+        }
+        else System.exit(0);
+        return null;
+    }
 }
