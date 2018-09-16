@@ -27,14 +27,16 @@ public class A1 {
                     break;
                 }
 
+                anfragenAmount++;
             }
 
             if(doesntFollow == true) {
-                for (int j = 0; namen.length - 1 >= j; j++){
-                    if(!anfrage(namen[j].toString(), namen[i].toString()) && namen[j] != namen[i]){
+                for (int j = 0; namen.length - 1 >= j; j++) {
+                    if (!anfrage(namen[j].toString(), namen[i].toString()) && namen[j] != namen[i]) {
                         getsFollowed = false;
                         break;
                     }
+                    anfragenAmount++;
                 }
             }
 
@@ -45,8 +47,9 @@ public class A1 {
         }
 
         for(int i = 0; ArrayStelle-1 >= i; i++){
-            System.out.println(superstars[i]);
+            System.out.println(superstars[i]+ " ist ein Superstar");
         }
+        System.out.println(anfragenAmount+" Anfragen");
 
     }
 
