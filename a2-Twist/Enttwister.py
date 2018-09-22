@@ -1,70 +1,102 @@
-from random import randint
+from os import listdir
+import codecs  # Für deutsche Umlaute
 
 
-class Enttwister:
+class Untwister:
 
     @staticmethod
     def start():
         # Text abfragen, der getwistet werden soll
-        user_input = input("Geben Sie den Text ein, der getwistet werden soll: ")
-        words = user_input.split()  # Woerter, die getwistet werden sollen in einer Liste speichern
-        twisted_words = []  # Liste fuer codierte Woerter initialisieren
+        options = Untwister.query_data()
+        for i in range(len(options)):
+            print("[" + str(i) + "] " + options[i])
 
-        for word in words:
-            if len(word) > 3:  # Wort muss getwisted werden
-                twisted_words.append(Enttwister.twist_word(word))
-            else:  # Bei drei oder weniger Buchstaben macht es keinen Sinn zu twisten
-                twisted_words.append(word)
+        print("-----------------")
+        user_choice = input("Ihre Auswahl: ")
 
-        output = "Getwisteter Text: "
-        for twisted_word in twisted_words:
-            output += " " + twisted_word
+        if user_choice == "0":
+            user_input = input("Manuelle Eingabe: ")
+            print("\n-------------\nEnttwisteter Text:\n-------------\n")
+            words = user_input.split()  # Woerter, die getwistet werden sollen in einer Liste speichern
+            output = ""
+            for word in words:
+                output += " " + Untwister.untwist_word(word)
+            print(output)
 
-        print(output)
+        else:
+            print("\n-------------\nEnttwisteter Text:\n-------------\n")
+            with codecs.open('beispieldaten/Enttwister/' + options[int(user_choice)], 'r', 'utf-8') as file:
+                lines = file.read().splitlines()
+                for line in lines:
+                    words = line.split()
+                    output = ""
+                    for word in words:
+                        output += " " + Untwister.untwist_word(word)
+                    print(output)
 
     @staticmethod
-    def twist_word(to_twist):
+    def untwist_word(to_untwist):
+        if len(to_untwist) < 4:  # Falls das Wort drei oder weniger Buchstaben hat, muss es nicht mehr enttwisted werden
+            return to_untwist
+
         first_letter_index = -1  # Falls kein Buchstabe gefunden wird, dient -1 als Platzhalter
-        for i in range(len(to_twist)):
-            if to_twist[i].isalpha():  # Wenn Zeichen an Position i ein Buchstabe ist...
+        for i in range(len(to_untwist)):
+            if to_untwist[i].isalpha():  # Wenn Zeichen an Position i ein Buchstabe ist...
                 first_letter_index = i
                 break
 
-        prefix = to_twist[:(first_letter_index + 1)]
-        boundary_left = (first_letter_index + 1)
+        if first_letter_index == -1:  # Nur Sonderzeichen sind vorhanden
+            return to_untwist
 
-        for j in range(boundary_left, len(to_twist)):
-            if not to_twist[j].isalpha():  # Wenn zweiter Zaehler auf Sonderzeichen stoesst
-                boundary_right = j-1
-                twisted_letters = Enttwister.twist_letters(to_twist[boundary_left:boundary_right])
-                suffix = to_twist[j-1:j+1]
-                next_word = Enttwister.twist_word(to_twist[j + 1:len(to_twist)])
+        if len(to_untwist)-first_letter_index < 4:  # Wenn das Wort nach dem Sonderzeichen maximal 3 Buchstaben hat
+            return to_untwist
 
-                return prefix + twisted_letters + suffix + next_word
+        prefix = to_untwist[:first_letter_index]
 
-        boundary_right = len(to_twist)-1
+        for j in range(first_letter_index, len(to_untwist)):
+            if not to_untwist[j].isalpha():  # Wenn zweiter Zaehler auf Sonderzeichen stoesst
+                last_letter_index = j
+                next_word = Untwister.untwist_word(to_untwist[j + 1:len(to_untwist)])
 
-        if first_letter_index == -1:  # Nur ein Sonderzeichen ist vorhanden
-            return to_twist
+                if (last_letter_index - first_letter_index) < 3:  # Es muss nicht getwistet werden, da höchstens drei Buchstaben
+                    return prefix + to_untwist[first_letter_index:j+1] + next_word
 
-        twisted_letters = Enttwister.twist_letters(to_twist[boundary_left:boundary_right])
-        suffix = to_twist[len(to_twist)-1]
-        return prefix + twisted_letters + suffix
+                suffix = to_untwist[j]  # Sonderzeichen
+                single_word_to_untwist = to_untwist[first_letter_index:last_letter_index]
+                untwisted_word = Untwister.find_word_in_dictionary(single_word_to_untwist)
+                return prefix + untwisted_word + suffix + next_word
+
+        single_word_to_untwist = to_untwist[first_letter_index:len(to_untwist)]
+        untwisted_word = Untwister.find_word_in_dictionary(single_word_to_untwist)
+        return prefix + untwisted_word
 
     @staticmethod
-    def twist_letters(to_twist):
-        ergebnis = ""
-        used_positions = []
+    def find_word_in_dictionary(to_replace):
+        with codecs.open('beispieldaten/sortierte_woerterliste.txt', 'r', 'utf-8') as sorted_word_list:
+            german_words = sorted_word_list.read().splitlines()
+            # TODO: Binary Search for the beginning letter for better performance
+            for word in german_words:
+                if not word.startswith(to_replace[0]) or not word.endswith(to_replace[-1]):
+                    continue
+                if not len(to_replace) == len(word):
+                    continue
 
-        for _ in range(len(to_twist)):
-            random_position = randint(0, len(to_twist) - 1)
-            while random_position in used_positions:
-                random_position = randint(0, len(to_twist) - 1)
+                # Buchstaben in der Mitte der Wörter vergleichen
+                sorted_mid_letters_1 = ''.join(sorted(word[1:-1]))
+                sorted_mid_letters_2 = ''.join(sorted(to_replace[1:-1]))
+                if sorted_mid_letters_1 == sorted_mid_letters_2:
+                    return word
 
-            ergebnis += to_twist[random_position]
-            used_positions.append(random_position)
+        return to_replace  # Wenn kein passendes Wort gefunden wurde
 
-        return ergebnis
+    @staticmethod
+    def query_data():
+        print("-----------------\nWelcher Text soll enttwistet werden?\n-----------------")
+        options_list = ["Manuelle Eingabe"]
+        text_files_in_sample_folder = [x for x in listdir("beispieldaten/Enttwister/") if x.endswith(".txt")]
+        options_list.extend(text_files_in_sample_folder)
+        return options_list
 
 
-Enttwister.start()
+Untwister.start()
+
