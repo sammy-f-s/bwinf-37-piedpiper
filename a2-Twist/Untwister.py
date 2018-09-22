@@ -1,5 +1,5 @@
 from os import listdir
-import codecs  # Für deutsche Umlaute
+import codecs  # Fuer deutsche Umlaute
 
 
 class Untwister:
@@ -58,7 +58,7 @@ class Untwister:
                 last_letter_index = j
                 next_word = Untwister.untwist_word(to_untwist[j + 1:len(to_untwist)])
 
-                if (last_letter_index - first_letter_index) < 3:  # Es muss nicht getwistet werden, da höchstens drei Buchstaben
+                if (last_letter_index - first_letter_index) < 3:  # Es muss nicht getwistet werden, da hoechstens drei Buchstaben
                     return prefix + to_untwist[first_letter_index:j+1] + next_word
 
                 suffix = to_untwist[j]  # Sonderzeichen
@@ -81,7 +81,7 @@ class Untwister:
                 if not len(to_replace) == len(word):
                     continue
 
-                # Buchstaben in der Mitte der Wörter vergleichen
+                # Buchstaben in der Mitte der Woerter vergleichen
                 sorted_mid_letters_1 = ''.join(sorted(word[1:-1]))
                 sorted_mid_letters_2 = ''.join(sorted(to_replace[1:-1]))
                 if sorted_mid_letters_1 == sorted_mid_letters_2:
