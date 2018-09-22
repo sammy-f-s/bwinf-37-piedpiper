@@ -1,5 +1,6 @@
 from random import randint
 from os import listdir
+import codecs  # Für deutsche Umlaute
 
 
 class Twister:
@@ -16,20 +17,23 @@ class Twister:
 
         if user_choice == "0":
             user_input = input("Manuelle Eingabe: ")
+            print("\n-------------\nGetwisteter Text:\n-------------\n")
             words = user_input.split()  # Woerter, die getwistet werden sollen in einer Liste speichern
-            twisted_words = []  # Liste fuer codierte Woerter initialisieren
-
+            output = ""
             for word in words:
-                twisted_words.append(Twister.twist_word(word))
-
-            output = "Getwisteter Text:"
-            for twisted_word in twisted_words:
-                output += " " + twisted_word
-
+                output += " " + Twister.twist_word(word)
             print(output)
 
         else:
-            pass
+            print("\n-------------Getwisteter Text:\n-------------\n")
+            with codecs.open('beispieldaten/Twister/' + options[int(user_choice)], 'r', 'utf-8') as file:
+                lines = file.read().splitlines()
+                for line in lines:
+                    words = line.split()
+                    output = ""
+                    for word in words:
+                        output += " " + Twister.twist_word(word)
+                    print(output)
 
     @staticmethod
     def twist_word(to_twist):
