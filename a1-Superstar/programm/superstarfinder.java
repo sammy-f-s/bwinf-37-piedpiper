@@ -8,45 +8,45 @@ import java.util.List;
 
 public class superstarfinder {
     public static void main(String args[]) throws IOException {
-        int anfragenAmount = 0; //um die herauszufinden, wie viele Anfragen benötigt worden sind
+        int inquiryAmount = 0; //um die herauszufinden, wie viele Anfragen benötigt worden sind
         boolean doesntFollow, getsFollowed; //Bedingung für Superstar: er folgt nicht, wird aber von allen gefolgt
         String filepath = chooseFile();
-        StringBuilder namen[] = splitFile(filepath);
-        String superstars[] = new String[namen.length - 1];
-        int ArrayStelle = 0;
-        for (int i = 0; namen.length - 1 >= i; i++) {
+        StringBuilder allNames[] = splitFile(filepath);
+        String superstars[] = new String[allNames.length - 1];
+        int arrayLocation = 0;
+        for (int i = 0; allNames.length - 1 >= i; i++) {
             doesntFollow = true;
             getsFollowed = true;
-            for (int j = 0; namen.length - 1 >= j; j++) {
+            for (int j = 0; allNames.length - 1 >= j; j++) {
 
-                if (anfrage(namen[i].toString(), namen[j].toString(), filepath)) { //Falls die Person irgendjemandem folgt, wird direkt abgebrochen und die nächste Person ausprobiert
+                if (anfrage(allNames[i].toString(), allNames[j].toString(), filepath)) { //Falls die Person irgendjemandem folgt, wird direkt abgebrochen und die nächste Person ausprobiert
                     doesntFollow = false;
                     break;
                 }
 
-                anfragenAmount++;
+                inquiryAmount++;
             }
 
             if (doesntFollow) {
-                for (int j = 0; namen.length - 1 >= j; j++) { //Das gleiche wie vorher, nur mit der nächsten Bedingung
-                    if (!anfrage(namen[j].toString(), namen[i].toString(), filepath) && namen[j] != namen[i]) {
+                for (int j = 0; allNames.length - 1 >= j; j++) { //Das gleiche wie vorher, nur mit der nächsten Bedingung
+                    if (!anfrage(allNames[j].toString(), allNames[i].toString(), filepath) && allNames[j] != allNames[i]) {
                         getsFollowed = false;
                         break;
                     }
-                    anfragenAmount++;
+                    inquiryAmount++;
                 }
             }
 
             if (getsFollowed && doesntFollow) { //Falls beide Bedingungen zutreffen wird die Person der Liste hinzugefügt
-                superstars[ArrayStelle] = namen[i].toString();
-                ArrayStelle++;
+                superstars[arrayLocation] = allNames[i].toString();
+                arrayLocation++;
             }
         }
 
-        for (int i = 0; ArrayStelle - 1 >= i; i++) {
+        for (int i = 0; arrayLocation - 1 >= i; i++) {
             System.out.println(superstars[i] + " ist ein Superstar");
         }
-        System.out.println(anfragenAmount + " Anfragen");
+        System.out.println(inquiryAmount + " Anfragen");
 
     }
 
@@ -55,7 +55,7 @@ public class superstarfinder {
         lines = Files.readAllLines(Paths.get(filepath), StandardCharsets.ISO_8859_1);
         //System.out.println(lines);
         int spaceAmount = 0;
-        int ArrayStelle = 0;
+        int arrayLocation = 0;
         String names = lines.get(0);
 
         for (int i = 0; names.length() - 1 >= i; i++) { //Anzahl an Leerzeichen rausfinden -> Wortanzahl und somit wie viele Leute es insgesamt gibt -> Arraygröße
@@ -63,11 +63,11 @@ public class superstarfinder {
         }
         StringBuilder[] allNames = new StringBuilder[spaceAmount + 1];
         for (int i = 0; names.length() - 1 >= i; i++) {
-            if (allNames[ArrayStelle] == null) allNames[ArrayStelle] = new StringBuilder();
+            if (allNames[arrayLocation] == null) allNames[arrayLocation] = new StringBuilder();
             if (names.charAt(i) == ' ') {
-                ArrayStelle++;
+                arrayLocation++;
             } else {
-                allNames[ArrayStelle].append(names.charAt(i));
+                allNames[arrayLocation].append(names.charAt(i));
             }
 
         }
@@ -77,8 +77,8 @@ public class superstarfinder {
 
     private static boolean anfrage(String name1, String name2, String filepath) throws IOException { //Anfrage: ob X, Y folgt
         List<String> lines;
-        lines = Files.readAllLines(Paths.get(filepath), StandardCharsets.ISO_8859_1);
-        for (int i = 1; lines.size() - 1 >= i; i++) {
+        lines = Files.readAllLines(Paths.get(filepath), StandardCharsets.ISO_8859_1); //Einlesen der Datei
+        for (int i = 1; lines.size() - 1 >= i; i++) {  //Durch alle Zeilen durchgehen und schauen ob der
             if ((lines.get(i)).contains(name1 + " " + name2)) {
                 return true;
             }
