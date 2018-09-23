@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-public class A1 {
+public class superstarfinder {
     public static void main (String args[]) throws IOException{
         int anfragenAmount = 0; //um die herauszufinden, wie viele Anfragen benötigt worden sind
         boolean doesntFollow, getsFollowed; //Bedingung für Superstar: er folgt nicht, wird aber von allen gefolgt
