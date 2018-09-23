@@ -18,8 +18,10 @@ class Untwister:
         if user_choice == "0":
             user_input = input("Manuelle Eingabe: ")
             print("\n-------------\nEnttwisteter Text:\n-------------\n")
-            words = user_input.split()  # Woerter, die getwistet werden sollen in einer Liste speichern
+            # Woerter, die getwistet werden sollen in einer Liste speichern
+            words = user_input.split()
             output = ""
+            # Wörter werden entwistet und durch Leerzeichen getrennt
             for word in words:
                 output += " " + Untwister.untwist_word(word)
             print(output)
@@ -27,13 +29,21 @@ class Untwister:
         # Auslesen einer zuvor bestimmten Textdatei
         else:
             print("\n-------------\nEnttwisteter Text:\n-------------\n")
+            # Ausgewählte Text-Datei wird geöffnet
             with codecs.open('beispieldaten/Enttwister/' + options[int(user_choice)], 'r', 'utf-8') as file:
+                # Alle Zeilen werden in einem Array gespeichert
                 lines = file.read().splitlines()
+                # Schleife durchläuft Zeile für Zeile
                 for line in lines:
+                    # Wörter einer Zeile werden in einem Array gespeichert
                     words = line.split()
+                    # Ausgabe für die jeweilige Zeile wird initialisiert
                     output = ""
+                    # Schleife durchläuft Wort für Wort
                     for word in words:
+                        # Wörter werden enttwistet und mit einem Leerzeichen getrennt
                         output += " " + Untwister.untwist_word(word)
+                    # Ausgabe einer enttwisteten Zeile
                     print(output)
 
     @staticmethod
