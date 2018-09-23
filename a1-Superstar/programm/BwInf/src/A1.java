@@ -2,28 +2,27 @@
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.List;
 
 public class A1 {
     public static void main (String args[]) throws IOException{
-        int anfragenAmount = 0;
-        boolean doesntFollow = false;
-        boolean getsFollowed = false; //Bedingung für Superstar: er folgt nicht, wird aber von allen gefolgt
-        StringBuilder namen[] = splitFile();
+        int anfragenAmount = 0; //um die herauszufinden, wie viele Anfragen benötigt worden sind
+        boolean doesntFollow, getsFollowed; //Bedingung für Superstar: er folgt nicht, wird aber von allen gefolgt
+        String filepath = chooseFile();
+        StringBuilder namen[] = splitFile(filepath);
         String superstars[] = new String[namen.length-1];
         int ArrayStelle = 0;
         for(int i = 0; namen.length-1 >= i;i++) {
             doesntFollow = true;
             getsFollowed = true;
-            for (int j = 0; namen.length - 1 >= j; j++) {
+            for(int j = 0; namen.length - 1 >= j; j++) {
 
-                if (anfrage(namen[i].toString(), namen[j].toString()) == true) { //Falls die Person folgt, wird direkt abgebrochen und die nächste Person ausprobiert
+                if (anfrage(namen[i].toString(), namen[j].toString(), filepath)) { //Falls die Person irgendjemandem folgt, wird direkt abgebrochen und die nächste Person ausprobiert
                     doesntFollow = false;
                     break;
                 }
@@ -31,9 +30,9 @@ public class A1 {
                 anfragenAmount++;
             }
 
-            if(doesntFollow == true) {
+            if(doesntFollow) {
                 for (int j = 0; namen.length - 1 >= j; j++) { //Das gleiche wie vorher, nur mit der nächsten Bedingung
-                    if (!anfrage(namen[j].toString(), namen[i].toString()) && namen[j] != namen[i]) {
+                    if (!anfrage(namen[j].toString(), namen[i].toString(), filepath) && namen[j] != namen[i]) {
                         getsFollowed = false;
                         break;
                     }
@@ -41,10 +40,10 @@ public class A1 {
                 }
             }
 
-        if(getsFollowed == true && doesntFollow == true){ //Falls beide Bedingungen zutreffen wird die Person der Liste hinzugefügt
-            superstars[ArrayStelle] = namen[i].toString();
-            ArrayStelle++;
-        }
+            if(getsFollowed && doesntFollow){ //Falls beide Bedingungen zutreffen wird die Person der Liste hinzugefügt
+              superstars[ArrayStelle] = namen[i].toString();
+              ArrayStelle++;
+              }
         }
 
         for(int i = 0; ArrayStelle-1 >= i; i++){
@@ -54,20 +53,20 @@ public class A1 {
 
     }
 
-    public static StringBuilder[] splitFile()throws IOException{  //String in Array aufteilen -> jeder Name hat eine Zeile
-        List<String> lines = Collections.emptyList();
-        lines = Files.readAllLines(Paths.get(chooseFile()), StandardCharsets.UTF_16);
+    private static StringBuilder[] splitFile(String filepath)throws IOException{  //String in Array aufteilen -> jeder Name hat eine Zeile
+        List<String> lines;
+        lines = Files.readAllLines(Paths.get(filepath), StandardCharsets.ISO_8859_1);
         //System.out.println(lines);
         int spaceAmount = 0;
         int ArrayStelle = 0;
         String names = lines.get(0);
 
-        for (int i = 0; names.length()-1 >= i;i++) { //Anzahl an Leerzeichen rausfinden -> Wortanzahl und somit wie viele Leute es insgesamt gibt
+        for (int i = 0; names.length()-1 >= i;i++) { //Anzahl an Leerzeichen rausfinden -> Wortanzahl und somit wie viele Leute es insgesamt gibt -> Arraygröße
             if (names.charAt(i) == ' ') spaceAmount++;
         }
         StringBuilder[] allNames = new StringBuilder[spaceAmount + 1];
         for(int i = 0; names.length()-1 >= i; i++){
-            if (allNames[ArrayStelle] == null) allNames[ArrayStelle] =  new StringBuilder("");
+            if (allNames[ArrayStelle] == null) allNames[ArrayStelle] =  new StringBuilder();
             if(names.charAt(i) == ' ') {
                 ArrayStelle++;
             }
@@ -80,9 +79,9 @@ public class A1 {
 
     }
 
-    public static boolean anfrage(String name1, String name2)throws IOException{ //Anfrage: ob X, Y folgt
-        List<String> lines = Collections.emptyList();
-        lines = Files.readAllLines(Paths.get(chooseFile()), StandardCharsets.UTF_16);
+    private static boolean anfrage(String name1, String name2, String filepath)throws IOException{ //Anfrage: ob X, Y folgt
+        List<String> lines;
+        lines = Files.readAllLines(Paths.get(filepath), StandardCharsets.ISO_8859_1);
         for(int i = 1;lines.size()-1 >= i;i++){
             if((lines.get(i)).contains(name1 + " " + name2)){
                 return true;
@@ -92,14 +91,14 @@ public class A1 {
 
     }
 
-    public static String chooseFile(){
+    private static String chooseFile(){
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Textdateien", "txt");
         chooser.setFileFilter(filter);
         int chosen = chooser.showOpenDialog(null);
 
         if(chosen == JFileChooser.APPROVE_OPTION) {
-            return chooser.getSelectedFile().toString();
+            return chooser.getSelectedFile().getPath();
         }
         else System.exit(0);
         return null;
