@@ -4,12 +4,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 public class superstarfinder {
+    private static int inquiriesAmount = 0;
+    //um zu speichern, wie viele Anfragen benötigt worden sind
     public static void main(String args[]) throws IOException {
-        int inquiriesAmount = 0;
-        //um zu speichern, wie viele Anfragen benötigt worden sind
         boolean doesntFollow, getsFollowed;
         //Bedingung für Superstar: er folgt nicht, wird aber von allen gefolgt
         String filepath = chooseFile();
@@ -17,8 +18,10 @@ public class superstarfinder {
         StringBuilder allNames[] = splitFile(filepath);
         //Die erste Zeile der Datei wird in ein Array umgewandelt, sodass nacheinander jeder Name anschließend ausprobiert wird
         String superstar = "";
-        //Dieses Array wird alle Superstars speichern
-        int arrayLocation = 0;
+        //Dieser String speichert den Superstar
+        List<String> nonRelevantMembers = new ArrayList<>();
+        //Diese Liste speichert alle Mitglieder, die vom Verfahren ausgeschlossen wurden, da sie schon die Bedingung nicht erfüllen, dass sie keiner Person folgen
+
         for (int i = 0; allNames.length - 1 >= i; i++) {
             doesntFollow = true;
             getsFollowed = true;
@@ -30,29 +33,29 @@ public class superstarfinder {
                     break;
                 }
 
-                inquiriesAmount++;
                 //Da eine Anfrage gestellt worden ist, wird der Zähler um einen hoch gesetzt um am Ende zu sehen, wie viele Anfragen gestellt worden ist
             }
 
-            if (doesntFollow) {
+            if (doesntFollow) { //TODO: Reihenfolge der Bediungen tauschen, nonRelevantMembers speichern und Bedingung der nonRelevantMember hinzufügen
                 for (int j = 0; allNames.length - 1 >= j; j++) {
                     //Das gleiche wie vorher, nur mit der nächsten Bedingung
                     if (!anfrage(allNames[j].toString(), allNames[i].toString(), filepath) && allNames[j] != allNames[i]) { //Falls eine Person nicht dem nun potentiellen Superstar folgt, wird abgebrochen. Die zweite Bedingung ist da um auszuschließen dass abgebrochen wird, wenn die Person nicht sich selber folgt
                         getsFollowed = false;
                         break;
+                    } else {
+                        nonRelevantMembers.add(allNames[j].toString()); //TODO: Überprüfen, ob das so funktioniert
                     }
-                    inquiriesAmount++;
                 }
             }
 
             if (getsFollowed && doesntFollow) {
-                //Falls die beiden Bedingungen nicht vorher von den zwei anderen for-Schleifen auf false gesetzt worden sind, wird die Person zur Liste der Superstars hinzugefügt
+                //Falls die beiden Bedingungen nicht vorher von den zwei anderen for-Schleifen auf false gesetzt worden sind, wird die Person als Superstar gesetzt und die Suche abgebrochen
                 superstar = allNames[i].toString();
-                arrayLocation++;
+                break;
             }
         }
 
-        System.out.println("Der Superstar ist: " + superstar + "\n "+ inquiriesAmount + " Anfragen");
+        System.out.println("Der Superstar ist: " + superstar + "\n " + inquiriesAmount + " Anfragen");
         //Ausgabe des Superstars und der verwendeten Anfragen
 
     }
@@ -71,7 +74,8 @@ public class superstarfinder {
         StringBuilder[] allNames = new StringBuilder[spaceAmount + 1];
         for (int i = 0; names.length() - 1 >= i; i++) {
             //Alle Namen werden eine eigene Zeile gebracht
-            if (allNames[arrayLocation] == null) allNames[arrayLocation] = new StringBuilder(); //Die Stelle muss erstmal als StringBuilder Objekt initialisiert werden
+            if (allNames[arrayLocation] == null)
+                allNames[arrayLocation] = new StringBuilder(); //Die Stelle muss erstmal als StringBuilder Objekt initialisiert werden
             if (names.charAt(i) == ' ') {
                 //Wenn erkannt wird, dass ein Leerzeichen vorhanden ist, wird in die nächste Stelle des Arrays gegangen
                 arrayLocation++;
@@ -92,9 +96,11 @@ public class superstarfinder {
         for (int i = 1; lines.size() - 1 >= i; i++) {
             //Durch alle Zeilen durchgehen und schauen ob X und Y, in dieser Reihenfolge, stehen
             if ((lines.get(i)).contains(name1 + " " + name2)) {
+                inquiriesAmount++;
                 return true;
             }
         }
+        inquiriesAmount++;
         return false;
 
     }
