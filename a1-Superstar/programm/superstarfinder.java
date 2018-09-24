@@ -16,7 +16,7 @@ public class superstarfinder {
         //Pfad der Datei wird gesetzt
         StringBuilder allNames[] = splitFile(filepath);
         //Die erste Zeile der Datei wird in ein Array umgewandelt, sodass nacheinander jeder Name anschließend ausprobiert wird
-        String superstars[] = new String[allNames.length - 1];
+        String superstar = "";
         //Dieses Array wird alle Superstars speichern
         int arrayLocation = 0;
         for (int i = 0; allNames.length - 1 >= i; i++) {
@@ -47,17 +47,13 @@ public class superstarfinder {
 
             if (getsFollowed && doesntFollow) {
                 //Falls die beiden Bedingungen nicht vorher von den zwei anderen for-Schleifen auf false gesetzt worden sind, wird die Person zur Liste der Superstars hinzugefügt
-                superstars[arrayLocation] = allNames[i].toString();
+                superstar = allNames[i].toString();
                 arrayLocation++;
             }
         }
 
-        for (int i = 0; arrayLocation - 1 >= i; i++) {
-            System.out.println(superstars[i] + " ist ein Superstar");
-            //Ausgabe der Superstars
-        }
-        System.out.println(inquiriesAmount + " Anfragen");
-        //Ausgabe der verwendeten Anfragen
+        System.out.println("Der Superstar ist: " + superstar + "\n "+ inquiriesAmount + " Anfragen");
+        //Ausgabe des Superstars und der verwendeten Anfragen
 
     }
 
