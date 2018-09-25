@@ -18,7 +18,7 @@ class Enttwister:
         if benutzer_auswahl == "0":
             benutzer_eingabe = input("Manuelle Eingabe: ")
             print("\n-------------\nEnttwisteter Text:\n-------------\n")
-            # Woerter, die getwistet werden sollen in einer Liste speichern
+            # Woerter, die enttwistet werden sollen in einer Liste speichern
             woerter = benutzer_eingabe.split()
             ausgabe = ""
             # Wörter werden entwistet und durch Leerzeichen getrennt
@@ -61,16 +61,17 @@ class Enttwister:
                 erster_buchstabe_pos = i
                 break
 
-        # Sofern beim vorherigen Schleifenvorgang kein Buchstabe gefunden worten ist...
+        # Sofern beim vorherigen Schleifenvorgang kein Buchstabe gefunden worden ist...
         if erster_buchstabe_pos == -1:
             # ... werden die Sonderzeichen oder Zahlen zurückgegeben
             return zu_enttwistendes_wort
 
-        if len(zu_enttwistendes_wort)-erster_buchstabe_pos < 4:  # Wenn das Wort nach dem Sonderzeichen maximal 3 Buchstaben hat...
+        # Wenn das Wort nach dem Sonderzeichen maximal 3 Buchstaben hat...
+        if len(zu_enttwistendes_wort)-erster_buchstabe_pos < 4:
             # ... wird die Zeichenkette auch zurückgegeben
             return zu_enttwistendes_wort
 
-        # Sonderzeichen oder Zahlen vor dem zu twistenden Wort, falls vorhanden
+        # Sonderzeichen oder Zahlen vor dem zu enttwistenden Wort, falls vorhanden
         praefix = zu_enttwistendes_wort[:erster_buchstabe_pos]
 
         # Zweite Schleife startet beim ersten Buchstaben und endet wenn an Position des Zählers j ein Sonderzeichen
@@ -80,7 +81,7 @@ class Enttwister:
             # Wenn zweiter Zaehler auf Sonderzeichen stoesst
             if not zu_enttwistendes_wort[j].isalpha():
 
-                # Rekursiver Methodenaufruf, damit alles, was nach dem Sonderzeichen folgt extra enttwistet wird
+                # Rekursiver Methodenaufruf, damit alles, was nach dem Sonderzeichen folgt, extra enttwistet wird
                 folgendes_wort = Enttwister.enttwiste_wort(zu_enttwistendes_wort[j + 1:len(zu_enttwistendes_wort)])
 
                 # Falls es sich nur um drei Buchstaben handelt, muss nicht enttwistet werden
