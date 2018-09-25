@@ -113,8 +113,9 @@ class Enttwister:
         with codecs.open('beispieldaten/sortierte_woerterliste.txt', 'r', 'utf-8') as sortierte_worterliste:
             # Deutsche Wörterliste wird in einem Array gespeichert
             alle_deutschen_woerter = sortierte_worterliste.read().splitlines()
-            # TODO: Binary Search for the beginning letter for better performance
-
+            # TODO: Binäre Suche zum Finden von Anfangsbuchstaben Grenze (z.B. in welchem Bereich liegt Buchstabe A)
+            # TODO: Liste zuerst nach Anfangsbuchstaben sortieren, dann nach ihren Endbuchstaben
+            # TODO: 2. Binäre Suche zum Finden aller Wörter mit dem selben Endbuchstaben
             # Es wird Wort für Wort die Wörterliste durchgegangen
             for wort in alle_deutschen_woerter:
                 # 1. Bedingung: Wort in der Liste muss denselben Anfangs- und Endbuchstaben
