@@ -92,8 +92,8 @@ class Enttwister:
                 suffix = zu_enttwistendes_wort[j]
                 # Das getwistete Wort ab dem ersten Buchstaben bis zum Buchstaben vor dem Sonderzeichen an Position j
                 getwistetes_wort = zu_enttwistendes_wort[erster_buchstabe_pos:j]
-                # Das getwistete Wort wird mithilfe der Methode passendes_wort_in_liste enttwistet
-                enttwistetes_wort = Enttwister.passendes_wort_in_liste(getwistetes_wort)
+                # Das getwistete Wort wird mithilfe der Methode wort_in_liste_finden enttwistet
+                enttwistetes_wort = Enttwister.wort_in_liste_finden(getwistetes_wort)
                 # Rückgabe des enttwisteten Wortes mit Sonderzeichen
                 return praefix + enttwistetes_wort + suffix + folgendes_wort
 
@@ -102,13 +102,13 @@ class Enttwister:
 
         # Das getwistete Wort
         getwistetes_wort = zu_enttwistendes_wort[erster_buchstabe_pos:len(zu_enttwistendes_wort)]
-        # Das getwistete Wort wird mithilfe der Methode passendes_wort_in_liste enttwistet
-        enttwistetes_wort = Enttwister.passendes_wort_in_liste(getwistetes_wort)
+        # Das getwistete Wort wird mithilfe der Methode wort_in_liste_finden enttwistet
+        enttwistetes_wort = Enttwister.wort_in_liste_finden(getwistetes_wort)
         # Rückgabe des enttwisteten Wortes mit möglichen Sonderzeichen
         return praefix + enttwistetes_wort
 
     @staticmethod
-    def passendes_wort_in_liste(getwistetes_wort):
+    def wort_in_liste_finden(getwistetes_wort):
         # Text-Datei mit deutschen Wörtern, alphabetisch sortiert, wird geöffnet
         with codecs.open('beispieldaten/sortierte_woerterliste.txt', 'r', 'utf-8') as sortierte_worterliste:
             # Deutsche Wörterliste wird in einem Array gespeichert
@@ -119,13 +119,15 @@ class Enttwister:
             for wort in alle_deutschen_woerter:
                 # 1. Bedingung: Wort in der Liste muss denselben Anfangs- und Endbuchstaben
                 # wie das zu enttwistende Wort haben
-                if not wort.startswith(getwistetes_wort[0]) or not wort.endswith(getwistetes_wort[-1]):
+                # Die Groß-und Kleinschreibung wird erstmal vernachlässigt, da die Liste unvollständig ist
+                if not (wort.lower().startswith(getwistetes_wort[0].lower()) and wort.endswith(getwistetes_wort[-1])):
                     continue
 
                 # 2. Bedingung: Länge der beiden Wörter muss gleich sein
                 if not len(getwistetes_wort) == len(wort):
                     continue
 
+                # 3. Bedingung: Gleiche Buchstaben müssen in beiden Wörtern gleich häufig vorkommen
                 # Alphabetisch sortierte Buchstaben in der Mitte des Wortes in der Liste
                 sortierte_buchstaben_1 = ''.join(sorted(wort[1:-1]))
                 # Alphabetisch sortierte Buchstaben in der Mitte des Wortes, das enttwistet werden soll
@@ -135,7 +137,9 @@ class Enttwister:
                 if sortierte_buchstaben_1 == sortierte_buchstaben_2:
                     # Es kann sein, dass ein anderes Wort dieselben Bedingungen erfüllt
                     # An dieser Stelle wird also die erste Übereinstimmung zurückgegeben
-                    return wort
+                    # Der Anfangsbuchstabe wird vom getwisteten Wort übernommen, da zuvor Groß-und Kleinschreibung
+                    # vernachlässigt wurde
+                    return getwistetes_wort[0] + wort[1:]
 
         # Wenn kein passendes Wort gefunden wurde
         return getwistetes_wort
