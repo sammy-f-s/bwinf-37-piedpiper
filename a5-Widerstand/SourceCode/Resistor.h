@@ -1,5 +1,6 @@
 #pragma once
 
+//Art der Verkabelung
 enum WiringType
 {
 	Serial,
