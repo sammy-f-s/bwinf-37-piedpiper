@@ -59,12 +59,18 @@ int main()
 	float desiredRes;
 	cout << "\nGewuenschter Widerstand?";
 	cin >> desiredRes;
-	
+
+	/* Beispiel aus der Aufgabe
+	usedResistors.emplace_back(1200, Serial);
+	usedResistors.emplace_back(3300, Parallel);
+	usedResistors.emplace_back(120, Serial);
+	usedResistors.emplace_back(1000, Parallel);
+	*/
+
 	for (int i = 0; i < k; i++)
 	{
 		float cRV = currentResistorValue(usedResistors);
 		float diff = abs(desiredRes - cRV);
-		if (diff < 1.0) { break; }
 
 		//Übergabe Variablen
 		float val;
@@ -74,7 +80,7 @@ int main()
 		//Serielle Annäherung
 		tie(val, resistor_Serial) = closestSerialAdd(availResistors, desiredRes, cRV);
 		float serialDiff = abs(val - desiredRes);
-		if (serialDiff == cRV) { serialDiff == 100000; } //wenn kein kleinerer wert gefunden wird, ist val = 0, wodurch das übernächste "if" nicht anschlägt
+		if (val == cRV) { serialDiff == 100000; } //wenn kein kleinerer wert gefunden wird, ist val = 0, wodurch das übernächste "if" nicht anschlägt (bedingt durch closestSerialAdd())
 
 		//Parallele Annäherung
 		tie(val, resistor_Parallel) = closestParallelAdd(availResistors, desiredRes, cRV);
@@ -104,78 +110,7 @@ int main()
 	}
 
 	drawCircuit(usedResistors, font);
-
-	system("PAUSE");
     return 0;
-}
-
-void drawCircuit(vector <Resistor> &used, sf::Font &font)
-{
-	sf::RenderWindow window(sf::VideoMode(800, 600), "Aufgabe 5");
-	window.setFramerateLimit(1);
-
-	//Hilfsvariablen zum Rendern
-	int parallelen = 1;
-	int len = 10;
-	int ylen = 100;
-
-	sf::Vector2i start = sf::Vector2i(50, 100);
-	sf::Vector2i end = sf::Vector2i(50, 100);
-	
-	while (window.isOpen())
-	{
-		sf::Event event;
-		if (window.pollEvent(event))
-		{
-			if (event.type == sf::Event::Closed)
-			{
-				window.close();
-			}
-		}
-		window.clear();
-
-		drawLine(0, 100, 50, 100, window);
-
-		for (Resistor r : used)
-		{
-			if (r.wtype == Serial)
-			{
-				drawLine(end.x, end.y, end.x + len, end.y, window);
-
-				drawRect(end.x + len, end.y - 20, 100, 40, window);
-				drawText(to_string(r.ohm), end.x + len + 2.5, end.y, window, font);
-
-				drawLine(end.x + 100 + len, end.y, end.x + 100 + len + len + 10 * parallelen, end.y, window);
-
-				end.x += 100 + len + len;
-			}
-			else if (r.wtype == Parallel)
-			{
-				drawLine(start.x - 10 * parallelen, start.y, start.x - 10 * parallelen, start.y + ylen * parallelen, window);
-				drawLine(start.x - 10 * parallelen, start.y + ylen * parallelen, start.x + len - 10 * parallelen, start.y + ylen * parallelen, window);
-
-				drawRect(start.x + len - 10 * parallelen, start.y + ylen * parallelen - 20, 100, 40, window);
-				drawText(to_string(r.ohm), start.x + len + 2.5 - 10 * parallelen, start.y + ylen * parallelen, window, font);
-
-				drawLine(start.x + len + 100 - 10 * parallelen, start.y + ylen * parallelen, end.x + 10 * parallelen, end.y + ylen * parallelen, window);
-				drawLine(end.x + 10 * parallelen, end.y + ylen * parallelen, end.x + 10 * parallelen, end.y, window);
-
-				end.x += 10;
-
-				parallelen++;
-			}
-		}
-
-		drawLine(end.x, end.y, end.x + 50, end.y, window);
-		drawText("Gesamtwiderstand = " + to_string(currentResistorValue(used)), 0, 0, window, font);
-
-		//Rendervariablen zurücksetzen für nächsten Frame
-		parallelen = 1;
-		start = sf::Vector2i(50, 100);
-		end = sf::Vector2i(50, 100);
-
-		window.display();
-	}
 }
 
 tuple<float, Resistor> closestSerialAdd(vector <float> &resistors, float desired, float current)
@@ -239,6 +174,74 @@ float currentResistorValue(vector <Resistor> &used)
 	}
 
 	return sum;
+}
+
+void drawCircuit(vector <Resistor> &used, sf::Font &font)
+{
+	sf::RenderWindow window(sf::VideoMode(800, 600), "Aufgabe 5");
+
+	//Hilfsvariablen zum Rendern
+	int parallelen = 1;
+	int len = 10;
+	int ylen = 100;
+
+	sf::Vector2i start = sf::Vector2i(50, 100);
+	sf::Vector2i end = sf::Vector2i(50, 100);
+
+	while (window.isOpen())
+	{
+		sf::Event event;
+		if (window.pollEvent(event))
+		{
+			if (event.type == sf::Event::Closed)
+			{
+				window.close();
+			}
+		}
+		window.clear();
+
+		drawLine(0, 100, 50, 100, window);
+
+		for (Resistor r : used)
+		{
+			if (r.wtype == Serial && r.ohm != 0)
+			{
+				drawLine(end.x, end.y, end.x + len, end.y, window);
+
+				drawRect(end.x + len, end.y - 20, 100, 40, window);
+				drawText(to_string((int)r.ohm), end.x + len + 2.5, end.y, window, font);
+
+				drawLine(end.x + 100 + len, end.y, end.x + 100 + len + len + 10 * parallelen, end.y, window);
+
+				end.x += 100 + len + len;
+			}
+			else if (r.wtype == Parallel && r.ohm != 0)
+			{
+				drawLine(start.x - 10 * parallelen, start.y, start.x - 10 * parallelen, start.y + ylen * parallelen, window);
+				drawLine(start.x - 10 * parallelen, start.y + ylen * parallelen, start.x + len - 10 * parallelen, start.y + ylen * parallelen, window);
+
+				drawRect(start.x + len - 10 * parallelen, start.y + ylen * parallelen - 20, 100, 40, window);
+				drawText(to_string((int)r.ohm), start.x + len + 2.5 - 10 * parallelen, start.y + ylen * parallelen, window, font);
+
+				drawLine(start.x + len + 100 - 10 * parallelen, start.y + ylen * parallelen, end.x + 10 * parallelen, end.y + ylen * parallelen, window);
+				drawLine(end.x + 10 * parallelen, end.y + ylen * parallelen, end.x + 10 * parallelen, end.y, window);
+
+				end.x += 10;
+
+				parallelen++;
+			}
+		}
+
+		drawLine(end.x, end.y, end.x + 50, end.y, window);
+		drawText("Gesamtwiderstand = " + to_string(currentResistorValue(used)), 0, 0, window, font);
+
+		//Rendervariablen zurücksetzen für nächsten Frame
+		parallelen = 1;
+		start = sf::Vector2i(50, 100);
+		end = sf::Vector2i(50, 100);
+
+		window.display();
+	}
 }
 
 void drawRect(int x, int y, int w, int h, sf::RenderWindow &window)
