@@ -13,13 +13,10 @@ import java.util.List;
 
 public class superstarfinder {
     private static int inquiriesAmount = 0;
+    //Um zu speichern, wie viele Anfragen benötigt wurden
 
-    //Um zu speichern, wie viele Anfragen benötigt worden sind
     public static void main(String args[]) throws IOException {
-
-        System.out.println("Der Superstar ist: " + findsuperstar() + "\n " + inquiriesAmount + " Anfragen");
-        //Ausgabe des Superstars und der verwendeten Anfragen
-
+            System.out.print("Der Superstar ist: " + findsuperstar() + "\n" + inquiriesAmount + " Anfragen");
     }
 
     private static String findsuperstar() throws IOException {
@@ -28,34 +25,51 @@ public class superstarfinder {
         //Bedingung für Superstar: er folgt nicht, wird aber von allen gefolgt
         String filepath = chooseFile();
         //Pfad der Datei wird gesetzt
-        StringBuilder allNames[] = splitFile(filepath);
+        List<String> allNames = (splitFile(filepath));
+        //Die erste Zeile der Datei, die alle Mitglieder auflistet, wird in ein Array aufgeteilt,
+        //sodass jedes Mitglied seine eigene Zeile bekommt
         List<String> allData = Files.readAllLines(Paths.get(filepath), StandardCharsets.ISO_8859_1);
-        //Die erste Zeile der Datei wird in ein Array umgewandelt, sodass nacheinander jeder Name anschließend ausprobiert wird
-        //Dieser String speichert später den Superstar
+        allData.remove(0);
+        //Die erste Zeile der Datei wird in ein Array umgewandelt
         List<String> nonRelevantMembers = new ArrayList<>();
         //Diese Liste speichert alle Mitglieder, die vom Verfahren ausgeschlossen wurden, da sie schon die Bedingung nicht erfüllen,
         // dass sie keiner Person folgen
+        List<String> allNamesSorted = new ArrayList<>(allNames);
+        String nameBuffer;
 
-        for (int i = 0; allNames.length - 1 >= i; i++) {
-            if (nonRelevantMembers.contains(allNames[i].toString())) continue;
+        for (int i = 0; allNames.size() - 1 >= i; i++) {
+
+            if (searchInListFor(nonRelevantMembers,allNames.get(i))){
+                continue;
+            }
+
             doesntFollow = true;
             getsFollowed = true;
 
-            for (int j = 0; allNames.length - 1 >= j; j++) {
+            for (int j = 0; allNames.size() - 1 >= j; j++) {
                 //Das gleiche wie vorher, nur mit der nächsten Bedingung
-                if (!anfrage(allNames[j].toString(), allNames[i].toString(), allData) && allNames[j] != allNames[i]) {
+                if (!allNamesSorted.get(j).contains(allNames.get(i)) && !anfrage(allNamesSorted.get(j), allNames.get(i), allData)) {
                     //Falls eine Person nicht dem nun potentiellen Superstar folgt, wird abgebrochen
                     // Die zweite Bedingung ist da um auszuschließen dass abgebrochen wird, wenn die Person nicht sich selber folgt
                     getsFollowed = false;
                     break;
-                } else if (!nonRelevantMembers.contains(allNames[j].toString())) {
-                    nonRelevantMembers.add(allNames[j].toString());
+                }
+                if (!allNamesSorted.get(j).contains(allNames.get(i)) && !searchInListFor(nonRelevantMembers, allNamesSorted.get(j))){
+                    nonRelevantMembers.add(allNamesSorted.get(j));
+                    //Name zur Liste der nicht relevanten Mitglieder hinzufügen
+                    nameBuffer = allNamesSorted.get(j);
+                    allNamesSorted.remove(j);
+                    allNamesSorted.add(nameBuffer);
+                    //Ans Ende der Liste setzten
+
                 }
             }
 
             if (getsFollowed) {
-                for (int j = 0; allNames.length - 1 >= j; j++) {
-                    if (anfrage(allNames[i].toString(), allNames[j].toString(), allData)) {
+                //Falls die Bedingung 2 (getsFollowed) nicht vorher von der vorherigen for-schleife auf false gesetzt worden ist,
+                //wird die Überprüfung fortgesetzt
+                for (int j = 0; allNames.size() - 1 >= j; j++) {
+                    if (!allNamesSorted.get(j).contains(allNames.get(i)) && anfrage(allNames.get(i), allNamesSorted.get(j), allData)) {
                         //Falls die Person irgendjemandem folgt, wird direkt abgebrochen und die nächste Person ausprobiert
                         doesntFollow = false;
                         break;
@@ -63,52 +77,48 @@ public class superstarfinder {
                 }
             } else continue;
 
-            if (getsFollowed && doesntFollow) {
-                //Falls die beiden Bedingungen nicht vorher von den zwei anderen for-Schleifen auf false gesetzt worden sind,
-                // wird die Person als Superstar gesetzt und die Suche abgebrochen
-                return allNames[i].toString();
+            if (doesntFollow) {
+                //Falls die Bedingungen 1 (doesntFollow) nicht vorher von der vorherigen for-Schleife auf false gesetzt worden ist,
+                // wird der von der ersten for-schleife ausgewählte potenzielle Superstar zurückgegeben, da dieses Mitglied der Superstar
+                //sein muss
+                return allNames.get(i);
             }
         }
         return "Niemand";
     }
 
-    private static StringBuilder[] splitFile(String filepath) throws IOException {
+    private static List<String> splitFile(String filepath) throws IOException {
         //String in Array aufteilen -> jeder Name hat eine Zeile
         List<String> lines = Files.readAllLines(Paths.get(filepath), StandardCharsets.ISO_8859_1);
-        int spaceAmount = 0;
-        int arrayLocation = 0;
+        int listLocation = 0;
         String names = lines.get(0);
 
-        for (int i = 0; names.length() - 1 >= i; i++) { //Anzahl an Leerzeichen rausfinden ->
-            // Wortanzahl und somit wie viele Leute es insgesamt gibt -> dies wird für die Arraygröße benötigt
-            if (names.charAt(i) == ' ') spaceAmount++;
-        }
-        StringBuilder[] allNames = new StringBuilder[spaceAmount + 1];
+        List<StringBuilder> allNames = new ArrayList<>();
+        allNames.add(new StringBuilder());
         for (int i = 0; names.length() - 1 >= i; i++) {
-            //Alle Namen werden eine eigene Zeile gebracht
-            if (allNames[arrayLocation] == null)
-                allNames[arrayLocation] = new StringBuilder();
-            //Die Stelle muss erstmal als StringBuilder Objekt initialisiert werden
             if (names.charAt(i) == ' ') {
-                //Wenn erkannt wird, dass ein Leerzeichen vorhanden ist, wird in die nächste Stelle des Arrays gegangen
-                arrayLocation++;
+                //Bei Leerzeichen in nächste Zeile
+                listLocation++;
+                allNames.add(new StringBuilder());
             } else {
-                allNames[arrayLocation].append(names.charAt(i));
-                //Sonst wird der aktuelle Buchstabe der aktuellen Stelle im Array angehängt
+                allNames.set(listLocation, allNames.get(listLocation).append(names.charAt(i)));
+                //Sonst wird der aktuelle Buchstabe der aktuellen Stelle angehängt
             }
         }
-        return allNames;
+        return toStringList(allNames);
     }
 
     private static boolean anfrage(String name1, String name2, List<String> allData) { //Anfrage: ob X, Y folgt
         inquiriesAmount++;
-        for (int i = 2; allData.size() - 1 >= i; i++) {
+        //Anfragenzähler
+        for (int i = 0; allData.size() - 1 >= i; i++) {
             //Durch alle Zeilen durchgehen und schauen ob X und Y, in dieser Reihenfolge, mit Leerzeichen dazwischen,
             // in einer Zeile stehen
             if ((allData.get(i)).contains(name1 + " " + name2)) {
                 return true;
             }
         }
+
         return false;
 
     }
@@ -127,4 +137,23 @@ public class superstarfinder {
         //Sonst wird beendet
         return null;
     }
+
+    private static boolean searchInListFor(List<String> listToSearch, String searchFor){
+        for(int i = 0; listToSearch.size()-1 >= i;i++){
+            if((listToSearch.get(i)).contains(searchFor)){
+                return true;
+            }
+        }
+        return false;
+
+    }
+
+    private static List<String> toStringList(List<StringBuilder> listToConvert){
+        List<String> list = new ArrayList<>();
+        for (int i = 0; listToConvert.size()-1 >= i; i++) {
+            list.add(listToConvert.get(i).toString());
+        }
+        return list;
+    }
 }
+
