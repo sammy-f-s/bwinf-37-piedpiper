@@ -1,4 +1,4 @@
-// Casino.cpp : Definiert den Einstiegspunkt für die Konsolenanwendung.
+// Casino.cpp : Definiert den Einstiegspunkt fï¿½r die Konsolenanwendung.
 //
 
 #define PBSTR "============================================================"
@@ -26,15 +26,19 @@ int main()
 {
 	//Zahlen der Teilnehmer
 	vector <int> entries;
+    //Al Capones Zahlen
 	vector <int> picks;
 
+    //Zufall initialisieren
 	srand(time(NULL));
 
+    //Nummer der Beispieldatei
 	int nr;
-	cout << "Beispiel Nr.?" << "    (0 für zufällige Zahlen)" << endl;
+	cout << "Beispiel Nr.?" << "    (0 fï¿½r zufï¿½llige Zahlen)" << endl;
 	cin >> nr;
 	cout << "-----------------" << endl;
-
+    
+    //Null um beliebige Anzahl zufÃ¤lliger Spiele zu machen
 	if (nr != 0)
 	{
 		ifstream stream("beispiel" + to_string(nr) + ".txt");
@@ -59,11 +63,11 @@ int main()
 		cout << "Al Capones Wahl: " << endl;
 		for (int i = 0; i < 10; i++)
 		{
-			//Unterteilung von 1000 in 10 gleichgroße Bereiche, mit dem Marker in der Mitte
+			//Unterteilung von 1000 in 10 gleichgroï¿½e Bereiche, mit dem Marker in der Mitte
 			//Start des Markers in der Mitte seines Bereiches
 			int marker = i * 100 + 50;
 
-			//Um möglichst dicht an möglichst vielen Leuten zu liegen wird die durchschnittlich gewählte Zahl in diesem Bereich errechnet
+			//Um mï¿½glichst dicht an mï¿½glichst vielen Leuten zu liegen wird die durchschnittlich gewï¿½hlte Zahl in diesem Bereich errechnet
 			float avInRange = averageInRange(entries, marker - 50, marker + 50);
 			cout << (int)avInRange << ", ";
 
@@ -75,7 +79,7 @@ int main()
 	}
 	else
 	{
-		cout << "Durchläufe?" << endl;
+		cout << "Durchlï¿½ufe?" << endl;
 		int iterations;
 		cin >> iterations;
 
@@ -125,11 +129,11 @@ float evaluate(vector <int> &entries)
 
 	for (int i = 0; i < 10; i++)
 	{
-		//Unterteilung von 1000 in 10 gleichgroße Bereiche, mit dem Marker in der Mitte
+		//Unterteilung von 1000 in 10 gleichgroï¿½e Bereiche, mit dem Marker in der Mitte
 		//Start des Markers in der Mitte seines Bereiches
 		int marker = i * 100 + 50;
 
-		//Um möglichst dicht an möglichst vielen Leuten zu liegen wird die durchschnittlich gewählte Zahl in diesem Bereich errechnet
+		//Um mï¿½glichst dicht an mï¿½glichst vielen Leuten zu liegen wird die durchschnittlich gewï¿½hlte Zahl in diesem Bereich errechnet
 		float avInRange = averageInRange(entries, marker - 50, marker + 50);
 
 		picks.push_back((int)avInRange);
