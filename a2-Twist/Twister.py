@@ -28,7 +28,7 @@ class Twister:
 
         # Auslesen einer zuvor bestimmten Textdatei
         else:
-            print("\n-------------Getwisteter Text:\n-------------\n")
+            print("\n-------------\nGetwisteter Text:\n-------------\n")
             # Ausgewählte Text-Datei wird geöffnet
             with codecs.open('beispieldaten/Twister/' + optionen[int(benutzer_auswahl)], 'r', 'utf-8') as file:
                 # Alle Zeilen werden in einem Array gespeichert

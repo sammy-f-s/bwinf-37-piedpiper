@@ -51,7 +51,6 @@ class Enttwister:
         # Falls das zu enttwistende Wort drei oder weniger Buchstaben hat, muss es nicht mehr enttwisted werden
         if len(zu_enttwistendes_wort) < 4:
             return zu_enttwistendes_wort
-
         # Falls kein Buchstabe gefunden wird, dient -1 als Platzhalter
         erster_buchstabe_pos = -1
 
@@ -97,25 +96,17 @@ class Enttwister:
                 # Rückgabe des enttwisteten Wortes mit Sonderzeichen
                 return praefix + enttwistetes_wort + suffix + folgendes_wort
 
-        # An dieser Stelle folgen keine weiteren Sonderzeichen nach dem ersten Buchstaben, da die Schleife
-        # ohne Rückgabe durchegelaufen ist
-
-        # Das getwistete Wort
         getwistetes_wort = zu_enttwistendes_wort[erster_buchstabe_pos:len(zu_enttwistendes_wort)]
         # Das getwistete Wort wird mithilfe der Methode wort_in_liste_finden enttwistet
         enttwistetes_wort = Enttwister.wort_in_liste_finden(getwistetes_wort)
-        # Rückgabe des enttwisteten Wortes mit möglichen Sonderzeichen
         return praefix + enttwistetes_wort
 
     @staticmethod
     def wort_in_liste_finden(getwistetes_wort):
-        # Text-Datei mit deutschen Wörtern, alphabetisch sortiert, wird geöffnet
-        with codecs.open('beispieldaten/sortierte_woerterliste.txt', 'r', 'utf-8') as sortierte_worterliste:
+        # Text-Datei mit deutschen Wörtern wird geöffnet
+        with codecs.open('beispieldaten/woerterliste.txt', 'r', 'utf-8') as sortierte_worterliste:
             # Deutsche Wörterliste wird in einem Array gespeichert
             alle_deutschen_woerter = sortierte_worterliste.read().splitlines()
-            # TODO: Binäre Suche zum Finden von Anfangsbuchstaben Grenze (z.B. in welchem Bereich liegt Buchstabe A)
-            # TODO: Liste zuerst nach Anfangsbuchstaben sortieren, dann nach ihren Endbuchstaben
-            # TODO: 2. Binäre Suche zum Finden aller Wörter mit dem selben Endbuchstaben
             # Es wird Wort für Wort die Wörterliste durchgegangen
             for wort in alle_deutschen_woerter:
                 # 1. Bedingung: Wort in der Liste muss denselben Anfangs- und Endbuchstaben
