@@ -1,4 +1,4 @@
-// Casino.cpp : Definiert den Einstiegspunkt fï¿½r die Konsolenanwendung.
+// Casino.cpp : Definiert den Einstiegspunkt für die Konsolenanwendung.
 //
 
 #define PBSTR "============================================================"
@@ -10,7 +10,6 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-#include <algorithm> //std::sort
 #include <time.h> //time(NULL)
 
 using namespace std;
@@ -24,21 +23,19 @@ float toPay(vector <int> &entries, vector <int> &picks);
 
 int main()
 {
+	//Umlaute
+	locale::global(locale("German_germany"));
 	//Zahlen der Teilnehmer
 	vector <int> entries;
-    //Al Capones Zahlen
 	vector <int> picks;
 
-    //Zufall initialisieren
 	srand(time(NULL));
 
-    //Nummer der Beispieldatei
 	int nr;
-	cout << "Beispiel Nr.?" << "    (0 fï¿½r zufï¿½llige Zahlen)" << endl;
+	cout << "Beispiel Nr.?" << "    (0 für zufällige Zahlen)" << endl;
 	cin >> nr;
 	cout << "-----------------" << endl;
-    
-    //Null um beliebige Anzahl zufÃ¤lliger Spiele zu machen
+
 	if (nr != 0)
 	{
 		ifstream stream("beispiel" + to_string(nr) + ".txt");
@@ -50,6 +47,7 @@ int main()
 			{
 				entries.push_back(stoi(line));
 			}
+			cout << "Teilnehmer:" << entries.size() << endl;
 		}
 		else
 		{
@@ -58,20 +56,25 @@ int main()
 			return 0;
 		}
 
+		/*Spezialfall
+		entries.clear();
+		entries = { 0,99,100,199,200,299,300,399,400,499,500,599,600,699,700,799,800,899,900,999 };
+		*/
+
 		cout << "Anfangseinnahmen: " << entries.size() * 25 << endl << endl;
 
 		cout << "Al Capones Wahl: " << endl;
 		for (int i = 0; i < 10; i++)
 		{
-			//Unterteilung von 1000 in 10 gleichgroï¿½e Bereiche, mit dem Marker in der Mitte
+			//Unterteilung von 1000 in 10 gleichgroße Bereiche, mit dem Marker in der Mitte
 			//Start des Markers in der Mitte seines Bereiches
 			int marker = i * 100 + 50;
 
-			//Um mï¿½glichst dicht an mï¿½glichst vielen Leuten zu liegen wird die durchschnittlich gewï¿½hlte Zahl in diesem Bereich errechnet
+			//Um möglichst dicht an möglichst vielen Leuten zu liegen wird die durchschnittlich gewählte Zahl in diesem Bereich errechnet
 			float avInRange = averageInRange(entries, marker - 50, marker + 50);
 			cout << (int)avInRange << ", ";
 
-			picks.push_back((int)avInRange);
+			picks.push_back(avInRange);
 		}
 
 		cout << endl << endl;
@@ -79,7 +82,7 @@ int main()
 	}
 	else
 	{
-		cout << "Durchlï¿½ufe?" << endl;
+		cout << "Durchläufe?" << endl;
 		int iterations;
 		cin >> iterations;
 
@@ -94,6 +97,7 @@ int main()
 			dGewinn += einzelGewinn;
 		}
 
+		//Durchschnittlicher Gewinn wird berechnet
 		dGewinn /= iterations;
 
 		cout << endl << "Durchschnittlicher Gewinn: " << dGewinn << endl;
@@ -103,7 +107,7 @@ int main()
 	return 0;
 }
 
-void printProgress(double p)
+inline void printProgress(double p)
 {
 	int val = (int)(p * 100);
 	int left = (int)(p * PBWIDTH);
@@ -112,28 +116,29 @@ void printProgress(double p)
 	fflush(stdout);
 }
 
-void fillRandomly(vector <int> &vec)
+inline void fillRandomly(vector <int> &vec)
 {
-	for (int i = 0; i < 100; i++)
+	int tries = rand() % 1000 + 100;
+	for (int i = 0; i < tries; i++)
 	{
 		vec.push_back(rand() % 1000 + 1);
 	}
 }
 
-//zur Quantifizierun (bilden des durchschnittlichen Gewinns)
+//zur Quantifizierung (bilden des durchschnittlichen Gewinns)
 float evaluate(vector <int> &entries)
 {
 	vector <int> picks;
-	
+
 	float anfangsEinnahmen = entries.size() * 25;
 
 	for (int i = 0; i < 10; i++)
 	{
-		//Unterteilung von 1000 in 10 gleichgroï¿½e Bereiche, mit dem Marker in der Mitte
+		//Unterteilung von 1000 in 10 gleichgroße Bereiche, mit dem Marker in der Mitte
 		//Start des Markers in der Mitte seines Bereiches
 		int marker = i * 100 + 50;
 
-		//Um mï¿½glichst dicht an mï¿½glichst vielen Leuten zu liegen wird die durchschnittlich gewï¿½hlte Zahl in diesem Bereich errechnet
+		//Um möglichst dicht an möglichst vielen Leuten zu liegen wird die durchschnittlich gewählte Zahl in diesem Bereich errechnet
 		float avInRange = averageInRange(entries, marker - 50, marker + 50);
 
 		picks.push_back((int)avInRange);
