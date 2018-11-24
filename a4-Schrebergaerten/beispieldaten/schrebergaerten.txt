@@ -1,12 +1,7 @@
-Zu dieser Aufgabe gibt es drei Beispiele von Schrebergärten (jeder
+﻿Zu dieser Aufgabe gibt es drei Beispiele von Schrebergärten (jeder
 Garten mit Länge x Breite), wobei das erste dem Beispiel in der
 Aufgabenstellung entspricht:
 
-1.
-25 x 15, 30 x 15, 25 x 20, 25 x 15.
-
-2.
-6 x 3, 2 x 2, 3 x 1, 4 x 4, 4 x 4.
-
-3.
-4 x 4, 3 x 2, 6 x 1, 5 x 2, 5 x 3.
+Beispiel 1: 25 x 15, 15 x 30, 15 x 25, 25 x 20.
+Beispiel 2: 6 x 3, 2 x 2, 3 x 1, 4 x 4, 4 x 4.
+Beispiel 3: 4 x 4, 2 x 3, 6 x 1, 5 x 2, 3 x 5.
