@@ -44,7 +44,6 @@ class Schrebergaerten:
                                     benutzte_rechtecke) > Schrebergaerten.kleinster_platzverlust:
                                 continue
                         if len(neue) == len(Schrebergaerten.eingabe):
-
                             if platzverlust == 0:
                                 return neue
                             elif platzverlust < Schrebergaerten.kleinster_platzverlust or Schrebergaerten.kleinster_platzverlust == -1:
@@ -217,19 +216,85 @@ class Schrebergaerten:
         return flaeche
 
 
+import sys
+from PyQt5.QtGui import QPainter, QBrush, QPen, QPaintEvent, QColor
+from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtCore import Qt
+
+
+class Interface(QMainWindow):
+
+    anordnung = []
+
+    def __init__(self):
+        super().__init__()
+        self.title = 'Schrebergärten'
+        self.left = 900
+        self.top = 200
+        self.width = 640
+        self.height = 480
+        self.initUI()
+
+    def initUI(self):
+        self.setWindowTitle(self.title)
+        self.setGeometry(self.left, self.top, self.width, self.height)
+        self.show()
+
+    def paintEvent(self, a0: QPaintEvent):
+        hoehe = 200
+        ursprung_x = 100
+        ursprung_y = 100
+        painter = QPainter(self)
+        painter.setPen(QPen(QColor(104, 73, 61), 4, Qt.SolidLine))
+        painter.setBrush(QBrush(QColor(39,174,96), Qt.SolidPattern))
+
+        x_max = 0
+        y_max = 0
+
+        for rechteck in Interface.anordnung:
+            if rechteck.ox + rechteck.x > x_max:
+                x_max = rechteck.ox + rechteck.x
+            if rechteck.oy + rechteck.y > y_max:
+                y_max = rechteck.oy + rechteck.y
+
+        if x_max > y_max:
+            scale = 200/x_max
+        else:
+            scale = 200/y_max
+
+        for rechteck in Interface.anordnung:
+            painter.drawRect(ursprung_x + rechteck.ox * scale, ursprung_y + hoehe - rechteck.oy * scale,
+                             rechteck.x * scale, -rechteck.y * scale)
+            if rechteck.ox + rechteck.x > x_max:
+                x_max = rechteck.ox + rechteck.x
+            if rechteck.oy + rechteck.y > y_max:
+                y_max = rechteck.oy + rechteck.y > y_max
+
+
 anzahl = int(input("Anz. der Schrebergaerten: "))
 for i in range(anzahl):
-    x = int(input("Schrebergarten " + str(i+1) + " - Breite: "))
-    y = int(input("Schrebergarten " + str(i+1) + " - Höhe: "))
-    Schrebergaerten.eingabe.append(Koordinate(x,y))
+    x = int(input("Schrebergarten " + str(i + 1) + " - Breite: "))
+    y = int(input("Schrebergarten " + str(i + 1) + " - Höhe: "))
+    Schrebergaerten.eingabe.append(Koordinate(x, y))
 
+print("\n Anordnung wird berechnet...")
 loesung = Schrebergaerten.finde_anordnung([], [])
+app = QApplication(sys.argv)
 if loesung != [-1]:
-    Schrebergaerten.displayAnordnung(loesung)
-    print("Platzverlust: 0")
-else:
-    Schrebergaerten.displayAnordnung(Schrebergaerten.beste_anordnung)
-    print("Platzverlust: " + str(Schrebergaerten.kleinster_platzverlust))
+    Interface.anordnung = loesung
 
-# 6 x 3, 2 x 2, 3 x 1, 4 x 4, 4 x 4.
+else:
+    Interface.anordnung = Schrebergaerten.beste_anordnung
+
+print("\n Anordnung gefunden! Interdace womöglich im Hintergrund")
+print("--> Platzverlust: " + str(Schrebergaerten.getPlatzverlust(Interface.anordnung)))
+print("--> Breite: " + str(Schrebergaerten.get_grenze(Interface.anordnung)[0]))
+print("--> Höhe: " + str(Schrebergaerten.get_grenze(Interface.anordnung)[1]))
+ex = Interface()
+sys.exit(app.exec_())
+
+
+#Beispiel 1: 25 x 15, 15 x 30, 15 x 25, 25 x 20.
+#Beispiel 2: 6 x 3, 2 x 2, 3 x 1, 4 x 4, 4 x 4.
+#eispiel 3: 4 x 4, 2 x 3, 6 x 1, 5 x 2, 3 x 5.
 
