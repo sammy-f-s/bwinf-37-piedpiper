@@ -15,14 +15,9 @@ class RechteckVektor:
 
 
 class Schrebergaerten:
-    eingabe = [Koordinate(2, 2), Koordinate(2, 1), Koordinate(1, 3)]
+    eingabe = []
     kleinster_platzverlust = -1
     beste_anordnung = []
-
-    @staticmethod
-    def start():
-        print(Schrebergaerten.finde_anordnung([RechteckVektor(2, 2, 0, 0)], [0]))
-        print(Schrebergaerten.beste_anordnung)
 
     @staticmethod
     def finde_anordnung(aktuelle_anordnung, benutzte_rechtecke):
@@ -43,12 +38,38 @@ class Schrebergaerten:
                         neue.append(RechteckVektor(rechteck.x, rechteck.y,
                                                    eckpunkt.x,
                                                    eckpunkt.y))
+                        platzverlust = Schrebergaerten.getPlatzverlust(neue)
+                        if Schrebergaerten.kleinster_platzverlust != -1:
+                            if platzverlust - Schrebergaerten.getUebrigeFlaeche(
+                                    benutzte_rechtecke) > Schrebergaerten.kleinster_platzverlust:
+                                continue
+                        if len(neue) == len(Schrebergaerten.eingabe):
+
+                            if platzverlust == 0:
+                                return neue
+                            elif platzverlust < Schrebergaerten.kleinster_platzverlust or Schrebergaerten.kleinster_platzverlust == -1:
+                                Schrebergaerten.beste_anordnung.clear()
+                                Schrebergaerten.beste_anordnung.extend(neue)
+                                Schrebergaerten.kleinster_platzverlust = platzverlust
+
+                        else:
+                            used = []
+                            used.extend(benutzte_rechtecke)
+                            used.append(rechteck_index)
+                            x = Schrebergaerten.finde_anordnung(neue, used)
+                            if not x == [-1]:
+                                return x
+                            used.clear()
 
                         neue.clear()
+        return [-1]
 
     @staticmethod
     def get_eckpunkte(anordnung):
         # Zunächst werden alle Eckpunkt-Koordinaten in einer Liste gespeichert
+        if len(anordnung) == 0:
+            return [Koordinate(0, 0)]
+
         eckpunkte_aller_rechtecke = []
         for rechteck in anordnung:
             eckpunkte_aller_rechtecke.append(Koordinate(rechteck.ox, rechteck.oy))
@@ -86,10 +107,14 @@ class Schrebergaerten:
         breite = 0
         hoehe = 0
         for rechteck in anordnung:
+            if rechteck.ox > breite:
+                breite = rechteck.ox
             if rechteck.x + rechteck.ox > breite:
                 breite = rechteck.x + rechteck.ox
             if rechteck.y + rechteck.oy > hoehe:
                 hoehe = rechteck.y + rechteck.oy
+            if rechteck.oy > hoehe:
+                hoehe = rechteck.oy
         return [breite, hoehe]
 
     @staticmethod
@@ -100,23 +125,39 @@ class Schrebergaerten:
     @staticmethod
     # Prüfen, ob Rechteck valide gesetzt werden kann, ohne Überschneidung
     def ueberschneidung_vorhanden(anordnung, rechteck):
-        koordinatensystem = Schrebergaerten.anordnung_in_felder(anordnung)
-        print(koordinatensystem)
-        if rechteck.x + rechteck.ox > rechteck.ox:
-            for x in range(rechteck.ox, rechteck.x + rechteck.ox):
-                if x >= len(koordinatensystem):
-                    continue
-                for y in range(rechteck.oy, rechteck.oy + rechteck.y):
-                    if y >= len(koordinatensystem[x]):
-                        continue
-                    if koordinatensystem[x][y]:
-                        print("-vorhanden-")
-                        Schrebergaerten.displayAnordnung(anordnung)
-                        return True
+        # Erstmal wird überprüft, ob das zu setzende Rechteck das Koordinatensystem nicht überschneidet
+        if rechteck.x + rechteck.ox < 0 or rechteck.y + rechteck.oy < 0:
+            return True
 
+        koordinatensystem_anordnung = Schrebergaerten.anordnung_in_felder(anordnung)
+        koordinatensystem_rechteck = Schrebergaerten.anordnung_in_felder([rechteck])
 
-        print("-nicht vorhanden-")
-        Schrebergaerten.displayAnordnung([rechteck])
+        if len(koordinatensystem_rechteck) >= len(koordinatensystem_anordnung):
+            x_range = len(koordinatensystem_rechteck)
+        else:
+            x_range = len(koordinatensystem_anordnung)
+
+        if len(koordinatensystem_rechteck[0]) >= len(koordinatensystem_anordnung[0]):
+            y_range = len(koordinatensystem_rechteck[0])
+        else:
+            y_range = len(koordinatensystem_anordnung[0])
+
+        koordinatensystem_kombi = []
+        for x_koordinate in range(x_range):
+            koordinatensystem_kombi.append([])
+            for y_koordinate in range(y_range):
+                koordinatensystem_kombi[x_koordinate].append(False)
+
+        for x in range(len(koordinatensystem_rechteck)):
+            for y in range(len(koordinatensystem_rechteck[0])):
+                if koordinatensystem_rechteck[x][y]:
+                    koordinatensystem_kombi[x][y] = True
+
+        for x in range(len(koordinatensystem_anordnung)):
+            for y in range(len(koordinatensystem_anordnung[0])):
+                if koordinatensystem_anordnung[x][y] and koordinatensystem_kombi[x][y]:
+                    return True
+
         return False
 
     @staticmethod
@@ -136,8 +177,18 @@ class Schrebergaerten:
 
         # Die Felder in denen sich Rechtecke befinden, werden nun auf True gesetzt
         for rechteck in anordnung:
-            for x in range(rechteck.ox, rechteck.ox + rechteck.x):
-                for y in range(rechteck.oy, rechteck.oy + rechteck.y):
+            if rechteck.x > 0:
+                x_range = range(rechteck.ox, rechteck.ox + rechteck.x)
+            else:
+                x_range = range(rechteck.ox + rechteck.x, rechteck.ox)
+
+            if rechteck.y > 0:
+                y_range = range(rechteck.oy, rechteck.oy + rechteck.y)
+            else:
+                y_range = range(rechteck.oy + rechteck.y, rechteck.oy)
+
+            for x in x_range:
+                for y in y_range:
                     koordinatensystem[x][y] = True
 
         return koordinatensystem
@@ -157,5 +208,28 @@ class Schrebergaerten:
             print(str(rechteck.x) + " " + str(rechteck.y) + " " + str(rechteck.ox) + " " + str(rechteck.oy))
         print("-----------")
 
+    @staticmethod
+    def getUebrigeFlaeche(benutzte_rechtecke):
+        flaeche = 0
+        for rechteck_index in benutzte_rechtecke:
+            flaeche += Schrebergaerten.eingabe[rechteck_index].x * Schrebergaerten.eingabe[rechteck_index].y
 
-Schrebergaerten.start()
+        return flaeche
+
+
+anzahl = int(input("Anz. der Schrebergaerten: "))
+for i in range(anzahl):
+    x = int(input("Schrebergarten " + str(i+1) + " - Breite: "))
+    y = int(input("Schrebergarten " + str(i+1) + " - Höhe: "))
+    Schrebergaerten.eingabe.append(Koordinate(x,y))
+
+loesung = Schrebergaerten.finde_anordnung([], [])
+if loesung != [-1]:
+    Schrebergaerten.displayAnordnung(loesung)
+    print("Platzverlust: 0")
+else:
+    Schrebergaerten.displayAnordnung(Schrebergaerten.beste_anordnung)
+    print("Platzverlust: " + str(Schrebergaerten.kleinster_platzverlust))
+
+# 6 x 3, 2 x 2, 3 x 1, 4 x 4, 4 x 4.
+
